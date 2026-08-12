@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Add User</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+  <div class="home-admin">
+
+    <nav class="navbar navbar-expand-lg nabar-light fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-brand" style="font-weight: 500;">
+          Admin Dashboard
+        </div>
+
+
+        <form action="/logout" method="POST">
+
+          <button type="submit" class="btn btn-danger">
+            Logout
+          </button>
+
+        </form>
+      </div>
+    </nav>
+
+
+    <div class="container mt-5">
+
+      <div class="row justify-content-center">
+
+        <div class="col-md-6">
+
+          <div class="card shadow">
+
+            <div class="card-header bg-primary text-white">
+
+              <h4 class="mb-0">
+                Add User
+              </h4>
+
+            </div>
+
+
+            <div class="card-body">
+
+              <form action="/admin/add-user" method="POST">
+
+                <!-- USERNAME -->
+
+                <div class="mb-3">
+
+                  <label class="form-label">
+                    Username
+                  </label>
+
+                  <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="mb-3">
+
+                  <label class="form-label">
+                    Password
+                  </label>
+
+                  <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+
+                </div>
+
+
+                <!-- ROLE -->
+
+                <div class="mb-3">
+
+                  <label class="form-label">
+                    Role
+                  </label>
+
+                  <select name="role" class="form-select" required>
+
+                    <option value="user">
+                      User
+                    </option>
+
+                    <option value="subadmin">
+                      Subadmin
+                    </option>
+
+                  </select>
+
+                </div>
+
+
+                <!-- BUTTONS -->
+
+                <div class="d-flex gap-2">
+
+                  <button type="submit" class="btn btn-primary">
+                    Create
+                  </button>
+
+
+                  <a href="/admin" class="btn btn-secondary">
+                    Cancel
+                  </a>
+
+                </div>
+
+              </form>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+
+</html>

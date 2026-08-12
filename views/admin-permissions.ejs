@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Subadmin Permissions</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+
+
+</head>
+
+
+<body>
+
+  <div class="home-admin">
+
+    <nav class="navbar navbar-expand-lg nabar-light fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-brand" style="font-weight: 500;">
+          Admin Dashboard
+        </div>
+
+
+        <form action="/logout" method="POST">
+
+          <button type="submit" class="btn btn-danger">
+            Logout
+          </button>
+
+        </form>
+      </div>
+    </nav>
+
+    <div class="container mt-5">
+
+      <div class="card">
+
+        <div class="card-header">
+
+          <h3>
+            Manage Subadmin Permissions
+          </h3>
+
+        </div>
+
+
+        <div class="card-body">
+
+          <h5 class="mb-4">
+
+            User:
+            <strong>
+              <%= user.name %>
+            </strong>
+
+          </h5>
+
+
+          <form action="/admin/permissions/<%= user._id %>" method="POST">
+
+
+            <!-- VIEW -->
+
+            <div class="form-check mb-3">
+
+              <input class="form-check-input" type="checkbox" name="viewUser" id="viewUser"
+                <%=user.permissions?.viewUser ? "checked" : "" %>
+              >
+
+              <label class="form-check-label" for="viewUser">
+                View Users
+              </label>
+
+            </div>
+
+
+            <!-- CREATE -->
+
+            <div class="form-check mb-3">
+
+              <input class="form-check-input" type="checkbox" name="createUser" id="createUser"
+                <%=user.permissions?.createUser ? "checked" : "" %>
+              >
+
+              <label class="form-check-label" for="createUser">
+                Create Users
+              </label>
+
+            </div>
+
+
+            <!-- EDIT -->
+
+            <div class="form-check mb-3">
+
+              <input class="form-check-input" type="checkbox" name="editUser" id="editUser"
+                <%=user.permissions?.editUser ? "checked" : "" %>
+              >
+
+              <label class="form-check-label" for="editUser">
+                Edit Users
+              </label>
+
+            </div>
+
+
+            <!-- DELETE -->
+
+            <div class="form-check mb-4">
+
+              <input class="form-check-input" type="checkbox" name="deleteUser" id="deleteUser"
+                <%=user.permissions?.deleteUser ? "checked" : "" %>
+              >
+
+              <label class="form-check-label" for="deleteUser">
+                Delete Users
+              </label>
+
+            </div>
+
+
+            <button type="submit" class="btn btn-primary">
+              Update Permissions
+            </button>
+
+
+            <a href="/admin" class="btn btn-secondary">
+              Cancel
+            </a>
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Edit User</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+  <div class="home-admin">
+
+    <nav class="navbar navbar-dark bg-dark">
+
+      <div class="container">
+
+        <a href="/admin" class="navbar-brand">
+          Admin Dashboard
+        </a>
+
+        <form action="/logout" method="POST">
+
+          <button type="submit" class="btn btn-danger">
+            Logout
+          </button>
+
+        </form>
+
+      </div>
+
+    </nav>
+
+
+    <div class="container mt-5">
+
+      <div class="row justify-content-center">
+
+        <div class="col-md-6">
+
+          <div class="card shadow">
+
+            <div class="card-header bg-warning">
+
+              <h4 class="mb-0">
+                Edit User
+              </h4>
+
+            </div>
+
+
+            <div class="card-body">
+
+              <form action="/admin/edit/<%= user._id %>" method="POST">
+
+                <!-- USERNAME -->
+
+                <div class="mb-3">
+
+                  <label class="form-label">
+                    Username
+                  </label>
+
+                  <input type="text" name="username" class="form-control" value="<%= user.name %>" required>
+
+                </div>
+
+
+                <!-- ROLE -->
+
+                <div class="mb-3">
+
+                  <label class="form-label">
+                    Role
+                  </label>
+
+                  <select name="role" class="form-select" required>
+
+                    <option value="user" <%=user.role==="user" ? "selected" : "" %>
+                      >
+                      User
+                    </option>
+
+                    <option value="subadmin" <%=user.role==="subadmin" ? "selected" : "" %>
+                      >
+                      Subadmin
+                    </option>
+
+                  </select>
+
+                </div>
+
+
+                <div class="d-flex gap-2">
+
+                  <button type="submit" class="btn btn-warning">
+                    Update User
+                  </button>
+
+                  <a href="/admin" class="btn btn-secondary">
+                    Cancel
+                  </a>
+
+                </div>
+
+              </form>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</body>
+
+</html>
