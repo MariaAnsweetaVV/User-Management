@@ -93,6 +93,12 @@ p {
   margin-top: 15px;
 }
 
+div.dt-container .dt-length {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .login-page {
   min-height: 100vh;
   width: 100%;
@@ -142,9 +148,6 @@ p {
   background-position: center;
   background-repeat: no-repeat;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 
@@ -157,7 +160,4 @@ p {
   background-position: center;
   background-repeat: no-repeat;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
