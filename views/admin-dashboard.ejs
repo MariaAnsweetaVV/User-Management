@@ -82,118 +82,121 @@
 
           <tbody>
 
-            <% users.forEach((user, index)=> { %>
+            <% let index=1; %>
 
-              <tr>
+              <% users.forEach((user)=> { %>
 
-                <td class="text-center">
-                  <%= index + 1 %>
-                </td>
+                <% if (user.role !=="admin" ) { %>
+                  <tr>
 
-
-                <td class="text-center">
-                  <%= user.name %>
-                </td>
+                    <td class="text-center">
+                      <%= index++ %>
+                    </td>
 
 
-                <td class="text-center">
+                    <td class="text-center">
+                      <%= user.name %>
+                    </td>
 
-                  <% if (user.role==="admin" ) { %>
 
-                    <span class="badge bg-danger">
-                      Admin
-                    </span>
+                    <td class="text-center">
 
-                    <% } else if (user.role==="subadmin" ) { %>
+                      <% if (user.role==="admin" ) { %>
 
-                      <span class="badge bg-warning text-dark">
-                        Subadmin
-                      </span>
-
-                      <% } else { %>
-
-                        <span class="badge bg-primary">
-                          User
+                        <span class="badge bg-danger">
+                          Admin
                         </span>
 
-                        <% } %>
+                        <% } else if (user.role==="subadmin" ) { %>
 
-                </td>
+                          <span class="badge bg-warning text-dark">
+                            Subadmin
+                          </span>
+
+                          <% } else { %>
+
+                            <span class="badge bg-primary">
+                              User
+                            </span>
+
+                            <% } %>
+
+                    </td>
 
 
-                <td>
+                    <td>
 
-                  <% if (user.permissions) { %>
+                      <% if (user.permissions) { %>
 
-                    <% if (user.permissions.createUser) { %>
-                      <span class="badge bg-success">
-                        Create
-                      </span>
-                      <% } %>
-
-                        <% if (user.permissions.editUser) { %>
-                          <span class="badge bg-info">
-                            Edit
+                        <% if (user.permissions.createUser) { %>
+                          <span class="badge bg-success">
+                            Create
                           </span>
                           <% } %>
 
-                            <% if (user.permissions.deleteUser) { %>
-                              <span class="badge bg-danger">
-                                Delete
+                            <% if (user.permissions.editUser) { %>
+                              <span class="badge bg-info">
+                                Edit
                               </span>
                               <% } %>
 
-                                <% if (user.permissions.viewUser) { %>
-                                  <span class="badge bg-secondary">
-                                    View
+                                <% if (user.permissions.deleteUser) { %>
+                                  <span class="badge bg-danger">
+                                    Delete
                                   </span>
                                   <% } %>
 
-                                    <% } %>
+                                    <% if (user.permissions.viewUser) { %>
+                                      <span class="badge bg-secondary">
+                                        View
+                                      </span>
+                                      <% } %>
 
-                </td>
+                                        <% } %>
+
+                    </td>
 
 
-                <td>
+                    <td>
 
-                  <% if (user.role !=="admin" ) { %>
+                      <% if (user.role !=="admin" ) { %>
 
-                    <!-- EDIT -->
-                    <a href="/admin/edit/<%= user._id %>" class="btn btn-warning btn-sm">
-                      Edit
-                    </a>
+                        <!-- EDIT -->
+                        <a href="/admin/edit/<%= user._id %>" class="btn btn-warning btn-sm">
+                          Edit
+                        </a>
 
-                    <!-- DELETE -->
-                    <form action="/admin/delete/<%= user._id %>" method="POST" style="display:inline;"
-                      onsubmit="return confirm('Are you sure you want to delete this user?');">
+                        <!-- DELETE -->
+                        <form action="/admin/delete/<%= user._id %>" method="POST" style="display:inline;"
+                          onsubmit="return confirm('Are you sure you want to delete this user?');">
 
-                      <button type="submit" class="btn btn-danger btn-sm">
-                        Delete
-                      </button>
+                          <button type="submit" class="btn btn-danger btn-sm">
+                            Delete
+                          </button>
 
-                    </form>
+                        </form>
 
-                    <!-- PERMISSIONS - ONLY SUBADMIN -->
-                    <% if (user.role==="subadmin" ) { %>
+                        <!-- PERMISSIONS - ONLY SUBADMIN -->
+                        <% if (user.role==="subadmin" ) { %>
 
-                      <a href="/admin/permissions/<%= user._id %>" class="btn btn-primary btn-sm">
-                        Permissions
-                      </a>
-
-                      <% } %>
-
-                        <% } else { %>
-
-                          <span class="text-muted">
-                            Admin account
-                          </span>
+                          <a href="/admin/permissions/<%= user._id %>" class="btn btn-primary btn-sm">
+                            Permissions
+                          </a>
 
                           <% } %>
 
-                </td>
-              </tr>
+                            <% } else { %>
 
-              <% }) %>
+                              <span class="text-muted">
+                                Admin account
+                              </span>
+
+                              <% } %>
+
+                    </td>
+                  </tr>
+                  <% } %>
+                    <% }) %>
 
           </tbody>
 
@@ -210,7 +213,9 @@
 
   <script>
     $(document).ready(function () {
-      $('#userTable').DataTable();
+      $('#userTable').DataTable({
+        scrollY: '500px'
+      });
     });
   </script>
 

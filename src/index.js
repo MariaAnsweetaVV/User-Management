@@ -50,8 +50,11 @@ app.get("/", (req, res) => {
     return res.redirect("/subadmin");
   }
 
-  return res.redirect("/home");
+  if (req.session.role === "user") {
+    return res.redirect("/home");
+  }
 
+  return res.redirect("/login");
 });
 
 // LOGIN PAGE
@@ -62,8 +65,9 @@ app.get("/login", (req, res) => {
     return res.redirect("/");
   }
 
-  res.render("login");
-
+  res.render("login", {
+    error: ""
+  });
 });
 
 // SIGNUP PAGE
@@ -74,7 +78,9 @@ app.get("/signup", (req, res) => {
     return res.redirect("/");
   }
 
-  res.render("signup");
+  res.render("signup", {
+    error: ""
+  });
 
 });
 
@@ -97,13 +103,10 @@ app.post("/signup", async (req, res) => {
 
 
     if (existingUser) {
-
-      return res.send(
-        "Username already exists. Please choose another username."
-      );
-
+      return res.render("signup", {
+        error: "User already exists. Please choose another username"
+      });
     }
-
     // Hash password
 
     const hashedPassword = await bcrypt.hash(
@@ -148,9 +151,9 @@ app.post("/signup", async (req, res) => {
 
     console.log(error);
 
-    res.send(
-      "Signup failed"
-    );
+    return res.render("signup", {
+      error: "Signup failed"
+    });
 
   }
 
@@ -176,11 +179,9 @@ app.post("/login", async (req, res) => {
 
 
     if (!user) {
-
-      return res.send(
-        "Username not found"
-      );
-
+      return res.render("login", {
+        error: "credentials invalid"
+      });
     }
 
     // Compare password
@@ -192,11 +193,9 @@ app.post("/login", async (req, res) => {
 
 
     if (!passwordMatch) {
-
-      return res.send(
-        "Wrong password"
-      );
-
+      return res.render("login", {
+        error: "credentials invalid"
+      });
     }
 
     // SAVE USER IN SESSION
@@ -230,9 +229,9 @@ app.post("/login", async (req, res) => {
 
     console.log(error);
 
-    res.send(
-      "Login failed"
-    );
+    return res.render("login", {
+      error: "Login failed"
+    });
 
   }
 
@@ -284,9 +283,9 @@ function isAdmin(req, res, next) {
 
   if (req.session.role !== "admin") {
 
-    return res.status(403).send(
-      "Access Denied"
-    );
+    return res.status(403).render("login", {
+      error: "Access Denied"
+    });
 
   }
 
@@ -308,9 +307,9 @@ function isSubadmin(req, res, next) {
 
   if (req.session.role !== "subadmin") {
 
-    return res.status(403).send(
-      "Access Denied"
-    );
+    return res.status(403).render("login", {
+      error: "Access Denied"
+    });
 
   }
 
@@ -355,9 +354,10 @@ function checkPermission(permission) {
         !user.permissions[permission]
       ) {
 
-        return res.status(403).send(
-          "You do not have permission to perform this action"
-        );
+        return res.status(403).render("login", {
+          error:
+            "You do not have permission to perform this action"
+        });
 
       }
 
@@ -369,9 +369,9 @@ function checkPermission(permission) {
 
       console.log(error);
 
-      res.status(500).send(
-        "Permission check failed"
-      );
+      return res.status(500).render("login", {
+        error: "Permission check failed"
+      });
 
     }
 
@@ -398,7 +398,9 @@ app.get(
 
           username: req.session.user,
 
-          users: users
+          users: users,
+
+          error: ""
 
         }
       );
@@ -408,8 +410,13 @@ app.get(
 
       console.log(error);
 
-      res.send(
-        "Unable to load admin dashboard"
+      return res.status(500).render(
+        "admin-dashboard",
+        {
+          username: req.session.user,
+          users: [],
+          error: "Unable to load admin dashboard"
+        }
       );
 
     }
@@ -424,7 +431,9 @@ app.get(
   isAdmin,
   (req, res) => {
 
-    res.render("add-user");
+    res.render("add-user", {
+      error: ""
+    });
 
   }
 );
@@ -452,9 +461,9 @@ app.post(
         !role
       ) {
 
-        return res.send(
-          "All fields are required"
-        );
+        return res.render("add-user", {
+          error: "All fields are required"
+        });
 
       }
 
@@ -464,8 +473,11 @@ app.post(
         !["user", "subadmin"].includes(role)
       ) {
 
-        return res.status(400).send(
-          "Invalid role"
+        return res.status(400).render(
+          "add-user",
+          {
+            error: "Invalid role"
+          }
         );
 
       }
@@ -481,9 +493,9 @@ app.post(
 
       if (existingUser) {
 
-        return res.send(
-          "Username already exists"
-        );
+        return res.render("add-user", {
+          error: "Username already exists"
+        });
 
       }
 
@@ -555,9 +567,9 @@ app.post(
 
       console.log(error);
 
-      res.send(
-        "Failed to create user"
-      );
+      return res.render("add-user", {
+        error: "Failed to create user"
+      });
 
     }
 
@@ -580,9 +592,13 @@ app.get(
 
 
       if (!user) {
-
-        return res.send(
-          "User not found"
+        return res.render(
+          "admin-dashboard",
+          {
+            username: req.session.user,
+            users: [],
+            error: "User not found"
+          }
         );
 
       }
@@ -592,8 +608,13 @@ app.get(
 
       if (user.role === "admin") {
 
-        return res.send(
-          "Admin account cannot be edited"
+        return res.render(
+          "admin-dashboard",
+          {
+            username: req.session.user,
+            users: [],
+            error: "Admin account cannot be edited"
+          }
         );
 
       }
@@ -602,7 +623,8 @@ app.get(
       res.render(
         "edit-user",
         {
-          user: user
+          user: user,
+          error: ""
         }
       );
 
@@ -611,8 +633,13 @@ app.get(
 
       console.log(error);
 
-      res.send(
-        "Unable to load user"
+      return res.render(
+        "admin-dashboard",
+        {
+          username: req.session.user,
+          users: [],
+          error: "Unable to load user"
+        }
       );
 
     }
@@ -637,8 +664,12 @@ app.post(
 
       if (!username || !role) {
 
-        return res.send(
-          "Username and role are required"
+        return res.render(
+          "edit-user",
+          {
+            user: user,
+            error: "Username and role are required"
+          }
         );
 
       }
@@ -648,8 +679,12 @@ app.post(
         !["user", "subadmin"].includes(role)
       ) {
 
-        return res.status(400).send(
-          "Invalid role"
+        return res.status(400).render(
+          "edit-user",
+          {
+            user: user,
+            error: "Invalid role"
+          }
         );
 
       }
@@ -663,8 +698,13 @@ app.post(
 
       if (!user) {
 
-        return res.send(
-          "User not found"
+        return res.render(
+          "admin-dashboard",
+          {
+            username: req.session.user,
+            users: [],
+            error: "User not found"
+          }
         );
 
       }
@@ -673,8 +713,12 @@ app.post(
 
       if (user.role === "admin") {
 
-        return res.send(
-          "Admin account cannot be edited"
+        return res.render(
+          "edit-user",
+          {
+            user: user,
+            error: "Admin account cannot be edited"
+          }
         );
 
       }
@@ -695,8 +739,12 @@ app.post(
 
       if (existingUser) {
 
-        return res.send(
-          "Username already exists"
+        return res.render(
+          "edit-user",
+          {
+            user: user,
+            error: "Username already exists"
+          }
         );
 
       }
@@ -764,8 +812,12 @@ app.post(
 
       console.log(error);
 
-      res.send(
-        "Failed to update user"
+      return res.render(
+        "edit-user",
+        {
+          user: null,
+          error: "Failed to update user"
+        }
       );
 
     }
@@ -790,8 +842,13 @@ app.post(
 
       if (!user) {
 
-        return res.send(
-          "User not found"
+        return res.render(
+          "admin-dashboard",
+          {
+            username: req.session.user,
+            users: [],
+            error: "User not found"
+          }
         );
 
       }
@@ -800,10 +857,14 @@ app.post(
 
       if (user.role === "admin") {
 
-        return res.status(403).send(
-          "Admin account cannot be deleted"
+        return res.status(403).render(
+          "admin-dashboard",
+          {
+            username: req.session.user,
+            users: [],
+            error: "Admin account cannot be deleted"
+          }
         );
-
       }
 
 
@@ -824,8 +885,13 @@ app.post(
 
       console.log(error);
 
-      res.send(
-        "Failed to delete user"
+      return res.render(
+        "admin-dashboard",
+        {
+          username: req.session.user,
+          users: [],
+          error: "Failed to delete user"
+        }
       );
 
     }
@@ -850,8 +916,13 @@ app.get(
 
       if (!user) {
 
-        return res.send(
-          "User not found"
+        return res.render(
+          "admin-dashboard",
+          {
+            username: req.session.user,
+            users: [],
+            error: "User not found"
+          }
         );
 
       }
@@ -860,8 +931,14 @@ app.get(
 
       if (user.role !== "subadmin") {
 
-        return res.status(403).send(
-          "Permissions can only be changed for subadmins"
+        return res.status(403).render(
+          "admin-dashboard",
+          {
+            username: req.session.user,
+            users: [],
+            error:
+              "Permissions can only be changed for subadmins"
+          }
         );
 
       }
@@ -870,7 +947,8 @@ app.get(
       res.render(
         "admin-permissions",
         {
-          user: user
+          user: user,
+          error: ""
         }
       );
 
@@ -879,8 +957,13 @@ app.get(
 
       console.log(error);
 
-      res.send(
-        "Unable to load permissions"
+      return res.render(
+        "admin-dashboard",
+        {
+          username: req.session.user,
+          users: [],
+          error: "Unable to load permissions"
+        }
       );
 
     }
@@ -915,8 +998,13 @@ app.post(
 
       if (!user) {
 
-        return res.send(
-          "User not found"
+        return res.render(
+          "admin-dashboard",
+          {
+            username: req.session.user,
+            users: [],
+            error: "User not found"
+          }
         );
 
       }
@@ -926,8 +1014,14 @@ app.post(
 
       if (user.role !== "subadmin") {
 
-        return res.status(403).send(
-          "Permissions can only be changed for subadmins"
+        return res.status(403).render(
+          "admin-dashboard",
+          {
+            username: req.session.user,
+            users: [],
+            error:
+              "Permissions can be managed only for subadmin"
+          }
         );
 
       }
@@ -969,98 +1063,16 @@ app.post(
 
       console.log(error);
 
-      res.send(
-        "Failed to update permissions"
-      );
-
-    }
-
-  }
-);
-
-// ADMIN - PERMISSIONS PAGE
-
-app.get(
-  "/admin/permissions/:id",
-  isAdmin,
-  async (req, res) => {
-
-    try {
-
-      const user = await collection.findById(
-        req.params.id
-      );
-
-      if (!user) {
-        return res.send("User not found");
-      }
-
-      // Permissions only for subadmin
-
-      if (user.role !== "subadmin") {
-        return res.status(403).send(
-          "Permissions can be managed only for subadmin"
-        );
-      }
-
-      res.render("admin-permissions", {
-        user: user
-      });
-
-    } catch (error) {
-
-      console.log(error);
-
-      res.send("Unable to load permissions");
-
-    }
-  }
-);
-
-// ADMIN - UPDATE PERMISSIONS
-
-app.post(
-  "/admin/permissions/:id",
-  isAdmin,
-  async (req, res) => {
-    try {
-      const user = await collection.findById(
-        req.params.id
-      );
-      if (!user) {
-        return res.send("User not found");
-      }
-      if (user.role !== "subadmin") {
-        return res.status(403).send(
-          "Permissions can be managed only for subadmin"
-        );
-      }
-      // Checkbox checked = "on"
-      // Checkbox unchecked = undefined
-      const permissions = {
-        createUser:
-          req.body.createUser === "on",
-        editUser:
-          req.body.editUser === "on",
-        deleteUser:
-          req.body.deleteUser === "on",
-        viewUser:
-          req.body.viewUser === "on"
-      };
-      await collection.findByIdAndUpdate(
-        req.params.id,
+      return res.render(
+        "admin-permissions",
         {
-          permissions: permissions
+          user: null,
+          error: "Failed to update permissions"
         }
       );
-      console.log(
-        `Permissions updated for ${user.name}`
-      );
-      res.redirect("/admin");
-    } catch (error) {
-      console.log(error);
-      res.send("Failed to update permissions");
+
     }
+
   }
 );
 
@@ -1080,13 +1092,19 @@ app.get(
         "subadmin-dashboard",
         {
           username: req.session.user,
-          users: users
+          users: users,
+          error: ""
         }
       );
     } catch (error) {
       console.log(error);
-      res.send(
-        "Unable to load subadmin dashboard"
+      return res.status(500).render(
+        "subadmin-dashboard",
+        {
+          username: req.session.user,
+          users: [],
+          error: "Unable to load user"
+        }
       );
     }
   }
@@ -1106,8 +1124,14 @@ app.post(
         password
       } = req.body;
       if (!username || !password) {
-        return res.send(
-          "Username and password are required"
+        return res.render(
+          "subadmin-dashboard",
+          {
+            username: req.session.user,
+            users: [],
+            error:
+              "Username and password are required"
+          }
         );
       }
 
@@ -1118,8 +1142,13 @@ app.post(
           name: username
         });
       if (existingUser) {
-        return res.send(
-          "Username already exists"
+        return res.render(
+          "subadmin-dashboard",
+          {
+            username: req.session.user,
+            users: [],
+            error: "Username already exists"
+          }
         );
       }
 
@@ -1150,8 +1179,14 @@ app.post(
       res.redirect("/subadmin");
     } catch (error) {
       console.log(error);
-      res.send(
-        "Failed to create user"
+
+      return res.render(
+        "subadmin-dashboard",
+        {
+          username: req.session.user,
+          users: [],
+          error: "Failed to create user"
+        }
       );
     }
   }
@@ -1170,28 +1205,46 @@ app.get(
           req.params.id
         );
       if (!user) {
-        return res.send(
-          "User not found"
+        return res.render(
+          "subadmin-dashboard",
+          {
+            username: req.session.user,
+            users: [],
+            error: "User not found"
+          }
         );
       }
 
       // Subadmin can edit only normal users
 
       if (user.role !== "user") {
-        return res.status(403).send(
-          "Subadmin can edit only normal users"
+        return res.status(403).render(
+          "subadmin-dashboard",
+          {
+            username: req.session.user,
+            users: [],
+            error:
+              "Subadmin can edit only normal users"
+          }
         );
       }
       res.render(
         "subadmin-edit-user",
         {
-          user: user
+          user: user,
+          error: ""
         }
       );
     } catch (error) {
       console.log(error);
-      res.send(
-        "Unable to load user"
+
+      return res.render(
+        "subadmin-dashboard",
+        {
+          username: req.session.user,
+          users: [],
+          error: "Unable to load user"
+        }
       );
     }
   }
@@ -1210,25 +1263,36 @@ app.post(
         username
       } = req.body;
       if (!username) {
-        return res.send(
-          "Username is required"
+        return res.render(
+          "subadmin-edit-user",
+          {
+            user: user,
+            error: "Username is required"
+          }
         );
       }
-      const user =
-        await collection.findById(
-          req.params.id
-        );
+
       if (!user) {
-        return res.send(
-          "User not found"
+        return res.render(
+          "subadmin-dashboard",
+          {
+            username: req.session.user,
+            users: [],
+            error: "User not found"
+          }
         );
       }
 
       // Protect Admin and Subadmin
 
       if (user.role !== "user") {
-        return res.status(403).send(
-          "Subadmin can edit only normal users"
+        return res.status(403).render(
+          "subadmin-edit-user",
+          {
+            user: user,
+            error:
+              "Subadmin can edit only normal users"
+          }
         );
       }
 
@@ -1241,9 +1305,14 @@ app.post(
             $ne: user._id
           }
         });
+
       if (existingUser) {
-        return res.send(
-          "Username already exists"
+        return res.render(
+          "subadmin-edit-user",
+          {
+            user: user,
+            error: "Username already exists"
+          }
         );
       }
 
@@ -1261,8 +1330,13 @@ app.post(
       res.redirect("/subadmin");
     } catch (error) {
       console.log(error);
-      res.send(
-        "Failed to update user"
+
+      return res.render(
+        "subadmin-edit-user",
+        {
+          user: null,
+          error: "Failed to update user"
+        }
       );
     }
   }
@@ -1275,9 +1349,9 @@ app.post(
   (req, res) => {
     req.session.destroy((err) => {
       if (err) {
-        return res.send(
-          "Logout failed"
-        );
+        return res.render("login", {
+          error: "Logout failed"
+        });
       }
       res.clearCookie(
         "connect.sid"
