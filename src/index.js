@@ -1244,20 +1244,24 @@ app.post(
   async (req, res) => {
 
     try {
+
       const {
         username
       } = req.body;
-      if (!username) {
-        return res.render(
-          "subadmin-edit-user",
-          {
-            user: user,
-            error: "Username is required"
-          }
+
+
+      // Find user first
+
+      const user =
+        await collection.findById(
+          req.params.id
         );
-      }
+
+
+      // User not found
 
       if (!user) {
+
         return res.render(
           "subadmin-dashboard",
           {
@@ -1266,11 +1270,29 @@ app.post(
             error: "User not found"
           }
         );
+
       }
 
-      // Protect Admin and Subadmin
+
+      // Username required
+
+      if (!username) {
+
+        return res.render(
+          "subadmin-edit-user",
+          {
+            user: user,
+            error: "Username is required"
+          }
+        );
+
+      }
+
+
+      // Subadmin can edit only normal users
 
       if (user.role !== "user") {
+
         return res.status(403).render(
           "subadmin-edit-user",
           {
@@ -1279,19 +1301,26 @@ app.post(
               "Subadmin can edit only normal users"
           }
         );
+
       }
+
 
       // Check duplicate username
 
       const existingUser =
         await collection.findOne({
+
           name: username,
+
           _id: {
             $ne: user._id
           }
+
         });
 
+
       if (existingUser) {
+
         return res.render(
           "subadmin-edit-user",
           {
@@ -1299,9 +1328,11 @@ app.post(
             error: "Username already exists"
           }
         );
+
       }
 
-      // Update user
+
+      // Update username
 
       await collection.findByIdAndUpdate(
         req.params.id,
@@ -1309,21 +1340,36 @@ app.post(
           name: username
         }
       );
+
+
       console.log(
         `User ${username} updated by subadmin`
       );
-      res.redirect("/subadmin");
-    } catch (error) {
-      console.log(error);
 
-      return res.render(
+
+      // Redirect to subadmin dashboard
+
+      res.redirect("/subadmin");
+
+
+    } catch (error) {
+
+      console.log(
+        "Subadmin update error:",
+        error
+      );
+
+
+      return res.status(500).render(
         "subadmin-edit-user",
         {
           user: null,
           error: "Failed to update user"
         }
       );
+
     }
+
   }
 );
 
