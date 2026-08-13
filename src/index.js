@@ -661,40 +661,11 @@ app.post(
         role
       } = req.body;
 
-
-      if (!username || !role) {
-
-        return res.render(
-          "edit-user",
-          {
-            user: user,
-            error: "Username and role are required"
-          }
-        );
-
-      }
-
-
-      if (
-        !["user", "subadmin"].includes(role)
-      ) {
-
-        return res.status(400).render(
-          "edit-user",
-          {
-            user: user,
-            error: "Invalid role"
-          }
-        );
-
-      }
-
-
+      // Find user first
       const user =
         await collection.findById(
           req.params.id
         );
-
 
       if (!user) {
 
@@ -710,7 +681,6 @@ app.post(
       }
 
       // Admin cannot be edited
-
       if (user.role === "admin") {
 
         return res.render(
@@ -723,8 +693,35 @@ app.post(
 
       }
 
-      // Check duplicate username
+      // Check fields
+      if (!username || !role) {
 
+        return res.render(
+          "edit-user",
+          {
+            user: user,
+            error: "Username and role are required"
+          }
+        );
+
+      }
+
+      // Only user and subadmin allowed
+      if (
+        !["user", "subadmin"].includes(role)
+      ) {
+
+        return res.status(400).render(
+          "edit-user",
+          {
+            user: user,
+            error: "Invalid role"
+          }
+        );
+
+      }
+
+      // Check duplicate username
       const existingUser =
         await collection.findOne({
 
@@ -735,7 +732,6 @@ app.post(
           }
 
         });
-
 
       if (existingUser) {
 
@@ -784,29 +780,19 @@ app.post(
       // UPDATE USER
 
       await collection.findByIdAndUpdate(
-
         req.params.id,
-
         {
-
           name: username,
-
           role: role,
-
           permissions: permissions
-
         }
-
       );
-
 
       console.log(
         "User updated successfully"
       );
 
-
       res.redirect("/admin");
-
 
     } catch (error) {
 
@@ -824,7 +810,6 @@ app.post(
 
   }
 );
-
 // ADMIN - DELETE USER
 
 app.post(
