@@ -24,8 +24,6 @@ h2 {
   top: 0;
   left: 0;
   width: 100%;
-  height: 70px;
-  position: fixed;
   z-index: 1000;
   font-weight: bold;
   font-size: 20px;
@@ -155,6 +153,7 @@ div.dt-container .dt-length {
 
 
 .home-subadmin {
+  padding-top: 90px;
   min-height: 100vh;
   width: 100%;
   background-image: url("/image/admin-img.jpg");
