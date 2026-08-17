@@ -969,7 +969,6 @@ app.post(
         viewUser,
         createUser,
         editUser,
-        deleteUser
       } = req.body;
 
 
@@ -1021,13 +1020,13 @@ app.post(
 
           permissions: {
 
-            viewUser: viewUser === "on",
+            viewUser: true,
 
             createUser: createUser === "on",
 
             editUser: editUser === "on",
 
-            deleteUser: deleteUser === "on"
+            deleteUser: false
 
           }
 
@@ -1068,30 +1067,45 @@ app.get(
   isSubadmin,
   checkPermission("viewUser"),
   async (req, res) => {
+
     try {
-      const users =
-        await collection.find({
-          role: "user"
-        }).lean();
+
+      // Get logged-in subadmin
+      const user = await collection.findById(
+        req.session.userId
+      );
+
+      // Get normal users
+      const users = await collection.find({
+        role: "user"
+      }).lean();
+
       res.render(
         "subadmin-dashboard",
         {
           username: req.session.user,
           users: users,
+          permissions: user.permissions,
           error: ""
         }
       );
+
     } catch (error) {
+
       console.log(error);
+
       return res.status(500).render(
         "subadmin-dashboard",
         {
           username: req.session.user,
           users: [],
+          permissions: {},
           error: "Unable to load user"
         }
       );
+
     }
+
   }
 );
 

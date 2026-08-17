@@ -23,7 +23,7 @@
     <nav class="navbar navbar-expand-lg nabar-light fixed-top">
       <div class="container-fluid">
         <div class="navbar-brand" style="font-weight: 500;">
-          Admin Dashboard
+          Admin Permissions
         </div>
 
 
@@ -69,9 +69,7 @@
 
             <div class="form-check mb-3">
 
-              <input class="form-check-input" type="checkbox" name="viewUser" id="viewUser"
-                <%=user.permissions?.viewUser ? "checked" : "" %>
-              >
+              <input class="form-check-input" type="checkbox" id="viewUser" checked disabled>
 
               <label class="form-check-label" for="viewUser">
                 View Users
@@ -105,21 +103,6 @@
 
               <label class="form-check-label" for="editUser">
                 Edit Users
-              </label>
-
-            </div>
-
-
-            <!-- DELETE -->
-
-            <div class="form-check mb-4">
-
-              <input class="form-check-input" type="checkbox" name="deleteUser" id="deleteUser"
-                <%=user.permissions?.deleteUser ? "checked" : "" %>
-              >
-
-              <label class="form-check-label" for="deleteUser">
-                Delete Users
               </label>
 
             </div>
